@@ -127,6 +127,7 @@
                                 android:text="Low"
                                 android:id="@+id/radiolow"
                                 android:layout_gravity="center_horizontal"
+                                android:checked="true"
                                 android:textSize="25dp" />
                         </RadioGroup>
                     </LinearLayout>
@@ -221,11 +222,17 @@
                         android:layout_marginBottom="10dp"
                         android:layout_marginTop="10dp" />
 
+
                     <ListView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/listView"
+                        android:layout_margin="5dp"
+
+                        android:divider="@color/colorPrimary"
+                        android:dividerHeight="2dp"
                         android:layout_gravity="center_horizontal" />
+
                 </LinearLayout>
 
             </FrameLayout>

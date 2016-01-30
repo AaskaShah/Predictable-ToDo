@@ -28,6 +28,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.good.todo_app.database.TablelistDataSource;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,7 +39,9 @@ import java.util.List;
 
 public class MainActivity extends Activity {
 
-    final  List<Listitem> detaillist =new ArrayList<Listitem>();
+    //final  List<Listitem> detaillist =new ArrayList<Listitem>();
+    List<Listitem> values =new ArrayList<Listitem>();
+    private TablelistDataSource datasource;
     //final List<ToDoThing> TheList = new ArrayList<ToDoThing>();
     ListView listview;
     Spinner Mainspinner, Subspinner;
@@ -45,9 +49,9 @@ public class MainActivity extends Activity {
     EditText adddetails;
     TextView priorenter,addhead;
     String[] SubCatOptions = {" ", "hey"};
-    String MainTxt, SubTxt;
+    String MainTxt, SubTxt,name;
     int viewId_Delete = 0;
-
+    int itemCount=0;
     TextView dateenter,timeenter;
     EditText date,time;
     private int mYear,mMonth,mDay,mHour,mMinute;
@@ -101,6 +105,29 @@ public class MainActivity extends Activity {
         timeenter=(TextView)findViewById(R.id.entertime);
         date=(EditText)findViewById(R.id.date);
         time=(EditText)findViewById(R.id.time);
+
+//add database to list
+
+        datasource = new TablelistDataSource(this);
+        datasource.open();
+        values = datasource.getAllItems();
+
+        if(values.size()==0)
+            itemCount=0;
+        else {
+            int max=0;
+            for (Listitem l:values
+                    ) {
+                if(max<l.getId())
+                    max=l.getId();
+            }
+            itemCount = max;
+        }
+
+        ArrayAdapter<Listitem> adapter = new ToDoListAdapter(values);
+        listview.setAdapter(adapter);
+
+
 //Spinners
         ArrayAdapter<String> MspinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, MainCatOptions);
         Mainspinner.setAdapter(MspinnerAdapter);
@@ -156,29 +183,49 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                int selectedid=radiopriority.getCheckedRadioButtonId();
-                priorityset=(RadioButton)findViewById(selectedid);
-                RadioButton high=(RadioButton)findViewById(R.id.radiohigh);
-                RadioButton low=(RadioButton)findViewById(R.id.radiolow);
-                if(i==0 || selectedid==low.getId()) {   //when priority low,add to last.
-                    Listitem x = new Listitem(SubTxt, adddetails.getText().toString(),date.getText().toString(),time.getText().toString(), MainTxt);
-                    detaillist.add(x);
-                    //listseen.add(addname.getText().toString());
+                if (adddetails.toString().length() == 0){
+                    adddetails.setError("Player name is required!");//not working
                 }
-                else{       //when priority high,add to first place.
-                    //for(int k=0;k<i;k++){
-                    //    detaillist[i]=detaillist[i-1];
-                    //}
-                    Listitem x =new Listitem(SubTxt, adddetails.getText().toString(),date.getText().toString(),time.getText().toString(),MainTxt);
-                    detaillist.add(0,x);
-                    //listseen.add(0,addname.getText().toString());
+                else {
+                    adddetails.setError(null);
+
+                    int selectedid = radiopriority.getCheckedRadioButtonId();
+                    priorityset = (RadioButton) findViewById(selectedid);
+                    RadioButton high = (RadioButton) findViewById(R.id.radiohigh);
+                    RadioButton low = (RadioButton) findViewById(R.id.radiolow);
+                    if (itemCount == 0 || selectedid == low.getId()) {   //when priority low,add to last.
+                        name = MainTxt + " : " + SubTxt;
+                        itemCount++;
+                        Listitem x = new Listitem(name, adddetails.getText().toString(), date.getText().toString(), time.getText().toString(), itemCount);
+                        values.add(x);
+                        //added in database
+                        datasource.insertlist(name, adddetails.getText().toString(), date.getText().toString(), time.getText().toString(), itemCount);
+
+                    } else {       //when priority high,add to first place.
+
+                        //database done for high priority
+                        name = MainTxt + " : " + SubTxt;
+                        itemCount++;
+                        Listitem x = new Listitem(name, adddetails.getText().toString(), date.getText().toString(), time.getText().toString(), itemCount);
+
+                        for (Listitem l:values
+                             ) {
+                            datasource.deletelist(l);
+                        }
+                        values.add(0, x);
+                        for (Listitem l:values
+                                ) {
+                            datasource.insertlist(l.getName(),l.getDetails(),l.getDate(),l.getTime(),l.getId());
+                        }
+
+                    }
+                    populatelist();
+                    i++;
+                    Toast.makeText(getApplicationContext(), "You've got something to do!", Toast.LENGTH_SHORT).show();
+                    adddetails.setText("");
+                    date.setText("");
+                    time.setText("");
                 }
-                populatelist();
-                i++;
-                Toast.makeText(getApplicationContext(), "You've got something to do!", Toast.LENGTH_SHORT).show();
-                adddetails.setText("");
-                date.setText("");
-                time.setText("");
 
             }
         });
@@ -239,7 +286,7 @@ public class MainActivity extends Activity {
         //    /----
 
 
-        //registerForContextMenu(listview);
+
     }
     public void setNotification(String dateTimeStr,int pos){
         SimpleDateFormat formatToCompare = new SimpleDateFormat(
@@ -256,7 +303,7 @@ public class MainActivity extends Activity {
 
         Intent intent = null;
         intent=new Intent(getApplicationContext(),TimeAlarm.class);
-        intent.putExtra("NOTIFICATION","Time to complete your list"+detaillist.get(pos).getName().toString());
+        intent.putExtra("NOTIFICATION","Time to complete your list"+values.get(pos).getName().toString());
         intent.putExtra("ID", pos);
         intent.putExtra("LONG", dateNotification.getTime());
 
@@ -269,52 +316,9 @@ public class MainActivity extends Activity {
                 sender);
     }
 
-    /*
-        @Override
-        public void onCreateContextMenu(ContextMenu menu,View v,ContextMenu.ContextMenuInfo menuInfo){
-            super.onCreateContextMenu(menu, v, menuInfo);
-            //add menu inflator and make context menu xml if this not working.
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-            menu.setHeaderTitle("Select the Action");
-            menu.add(0, v.getId(), 0, "Delete");
-            viewId_Delete = info.position;
-
-        }
-
-        @Override
-        public boolean onContextItemSelected(MenuItem item){
-            AdapterView.AdapterContextMenuInfo info=(AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-            int pos = viewId_Delete;
-            try {
-
-                if (item.getTitle().equals("Delete")) {
-
-                    final Listitem current1 = detaillist.get(pos);
-                    detaillist.remove(current1);
-                    /*if(position==i-1)
-                        detaillist[i-1]=null;
-                    else {
-                        int j;
-                        for (j = position; j < i; j++) {
-                            detaillist[j] = detaillist[j + 1];
-                        }
-                        detaillist[j]=null;
-                    }
-                    i--;*\
-
-                    populatelist();
-                    return true;
-                } else {
-                    return false;
-                }
-            }catch(Exception e){
-                return true;
-            }
-        }
-    */
     public void populatelist(){
 
-        ArrayAdapter<Listitem> adapter = new ToDoListAdapter();
+        ArrayAdapter<Listitem> adapter = new ToDoListAdapter(values);
         listview.setAdapter(adapter);
     }
 
@@ -326,8 +330,10 @@ public class MainActivity extends Activity {
     }
 
     private class ToDoListAdapter extends ArrayAdapter<Listitem> {
-        public ToDoListAdapter() {
-            super(MainActivity.this, R.layout.listview_item, detaillist);
+        List<Listitem> thislist;
+        public ToDoListAdapter(List<Listitem> list) {
+            super(MainActivity.this, R.layout.listview_item, list);
+            thislist=list;
         }
 
 
@@ -336,7 +342,7 @@ public class MainActivity extends Activity {
             if (view == null)
                 view = getLayoutInflater().inflate(R.layout.listview_item, parent, false);
 
-            final Listitem current = detaillist.get(position);
+            final Listitem current = thislist.get(position);
 
             TextView name = (TextView) view.findViewById(R.id.textView);
             name.setText(current.getName());
@@ -372,13 +378,14 @@ public class MainActivity extends Activity {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
                             if (item.getItemId() == R.id.Delete) {
-                                detaillist.remove(current);
-                                ArrayAdapter<Listitem> adapter = new ToDoListAdapter();
+                                thislist.remove(current);
+                                datasource.deletelist(current);
+                                ArrayAdapter<Listitem> adapter = new ToDoListAdapter(thislist);
                                 listview.setAdapter(adapter);
                             }
 
                             else if (item.getItemId() == R.id.Edit) {
-                                Toast.makeText(getApplicationContext(), "Editting",Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Editting will be added later",Toast.LENGTH_LONG).show();
                                 
                             }
 
