@@ -2,9 +2,12 @@ package com.example.good.todo_app;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -57,7 +60,7 @@ public class MainActivity extends Activity {
     private int mYear,mMonth,mDay,mHour,mMinute;
 
     TextView wantanalarm;Button notification;
-
+    int flagdelete=0;
 
     final String[] MainCatOptions = {" ","Appointments","Chores and Errands","Back to books","Shopping","Time for some fun!","Anything else?"};
     final String[] SubShop = {" ","Groceries","Medicines","Clothes and Accessories","Gift"};
@@ -329,6 +332,7 @@ public class MainActivity extends Activity {
         return true;
     }
 
+    final Context contxt=this;
     private class ToDoListAdapter extends ArrayAdapter<Listitem> {
         List<Listitem> thislist;
         public ToDoListAdapter(List<Listitem> list) {
@@ -378,10 +382,33 @@ public class MainActivity extends Activity {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
                             if (item.getItemId() == R.id.Delete) {
-                                thislist.remove(current);
-                                datasource.deletelist(current);
-                                ArrayAdapter<Listitem> adapter = new ToDoListAdapter(thislist);
-                                listview.setAdapter(adapter);
+                                //delete dialog
+                                AlertDialog.Builder builder1 = new AlertDialog.Builder(contxt);
+                                builder1.setMessage("Confirm delete?");
+                                builder1.setCancelable(true);
+
+                                builder1.setPositiveButton(
+                                        "Delete",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                thislist.remove(current);
+                                                datasource.deletelist(current);
+                                                ArrayAdapter<Listitem> adapter = new ToDoListAdapter(thislist);
+                                                listview.setAdapter(adapter);
+                                                dialog.cancel();
+                                            }
+                                        });
+
+                                builder1.setNegativeButton(
+                                        "Cancel",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                dialog.cancel();
+                                            }
+                                        });
+
+                                AlertDialog alert11 = builder1.create();
+                                alert11.show();
                             }
 
                             else if (item.getItemId() == R.id.Edit) {
@@ -400,7 +427,6 @@ public class MainActivity extends Activity {
             return view;
         }
     }
-
 /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
