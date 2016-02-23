@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Listitemseen"></activity>
-
+        <receiver android:name=".TimeAlarm" android:process=":remote" />
     </application>
 
 </manifest>

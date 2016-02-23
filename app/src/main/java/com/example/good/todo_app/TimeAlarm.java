@@ -6,17 +6,25 @@ package com.example.good.todo_app;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.os.IBinder;
+import android.support.v7.app.NotificationCompat;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
-public class TimeAlarm
-        extends BroadcastReceiver{
-    Calendar cal= Calendar.getInstance();
+public class TimeAlarm extends BroadcastReceiver {
 
+    @Override
+    public void onReceive(Context arg0, Intent arg1) {
+        Toast.makeText(arg0, "Alarm received!", Toast.LENGTH_LONG).show();
 
+    }
+/*
     @Override
     public void onReceive(Context context, Intent intent) {
         NotificationManager nm=null;
@@ -42,6 +50,6 @@ public class TimeAlarm
 
         //  context.startActivity(new Intent(context, ReservationListing.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
-
+*/
 
 }
