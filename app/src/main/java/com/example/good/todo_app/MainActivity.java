@@ -55,9 +55,9 @@ public class MainActivity extends Activity {
     String MainTxt, SubTxt,name;
     int viewId_Delete = 0;
     int itemCount=0;
-    TextView dateenter,timeenter;
-    EditText date,time;
-    private int mYear,mMonth,mDay,mHour,mMinute;
+    TextView dateenter;
+    EditText date;
+    private int mYear,mMonth,mDay;
 
 
     int flagdelete=0;
@@ -105,9 +105,9 @@ public class MainActivity extends Activity {
         Button btn=(Button)findViewById(R.id.addbutton);
 //-----date-times
         dateenter=(TextView)findViewById(R.id.enterdate);
-        timeenter=(TextView)findViewById(R.id.entertime);
+
         date=(EditText)findViewById(R.id.date);
-        time=(EditText)findViewById(R.id.time);
+
 
 //add database to list
 
@@ -197,17 +197,17 @@ public class MainActivity extends Activity {
                     if (itemCount == 0 || selectedid == low.getId()) {   //when priority low,add to last.
                         name = MainTxt + " : " + SubTxt;
                         itemCount++;
-                        Listitem x = new Listitem(name, adddetails.getText().toString(), date.getText().toString(), time.getText().toString(), itemCount);
+                        Listitem x = new Listitem(name, adddetails.getText().toString(), date.getText().toString(),"", itemCount);
                         values.add(x);
                         //added in database
-                        datasource.insertlist(name, adddetails.getText().toString(), date.getText().toString(), time.getText().toString(), itemCount);
+                        datasource.insertlist(name, adddetails.getText().toString(), date.getText().toString(), "", itemCount);
 
                     } else {       //when priority high,add to first place.
 
                         //database done for high priority
                         name = MainTxt + " : " + SubTxt;
                         itemCount++;
-                        Listitem x = new Listitem(name, adddetails.getText().toString(), date.getText().toString(), time.getText().toString(), itemCount);
+                        Listitem x = new Listitem(name, adddetails.getText().toString(), date.getText().toString(), "", itemCount);
 
                         for (Listitem l:values
                              ) {
@@ -225,7 +225,7 @@ public class MainActivity extends Activity {
                     Toast.makeText(getApplicationContext(), "You've got something to do!", Toast.LENGTH_SHORT).show();
                     adddetails.setText("");
                     date.setText("");
-                    time.setText("");
+
                 }
 
             }
@@ -257,31 +257,12 @@ public class MainActivity extends Activity {
             }
         });
 //-------
-//----time picker----
-        final Calendar ca= Calendar.getInstance();
-        mHour=ca.get(Calendar.HOUR_OF_DAY);
-        mMinute=ca.get(Calendar.MINUTE);
-
-        final TimePickerDialog tpd=new TimePickerDialog(this,new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                time.setText(hourOfDay + ":" + minute);
-            }
-        },mHour,mMinute,false);
-        time.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                tpd.show();
-            }
-
-        });
 
 
 
 
     }
-    
+
 
     public void populatelist(){
 
