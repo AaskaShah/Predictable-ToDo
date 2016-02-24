@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
     EditText date,time;
     private int mYear,mMonth,mDay,mHour,mMinute;
 
-    TextView wantanalarm;Button notification;
+
     int flagdelete=0;
 
     final String[] MainCatOptions = {" ","Appointments","Chores and Errands","Back to books","Shopping","Time for some fun!","Anything else?"};
@@ -175,9 +175,7 @@ public class MainActivity extends Activity {
                     }
                 });
 //-------
-        //notifications---
-        wantanalarm=(TextView)findViewById(R.id.wantanalarm);
-        notification=(Button)findViewById(R.id.noti);
+
 
 //--
         radiopriority=(RadioGroup)findViewById(R.id.radiogroup);//add setonCheckedChangeListner here if priority not changing..
@@ -278,46 +276,12 @@ public class MainActivity extends Activity {
             }
 
         });
-//-------notification
-        notification.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String datetime=date+" "+time;
-                setNotification(datetime,i);
-            }
-        });
-        //    /----
+
 
 
 
     }
-    public void setNotification(String dateTimeStr,int pos){
-        SimpleDateFormat formatToCompare = new SimpleDateFormat(
-                "MM-dd-yyyy hh:mm");
-        Date dateNotification = null;
-
-        try {
-            dateNotification = formatToCompare
-                    .parse(dateTimeStr);
-        } catch (java.text.ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        Intent intent = null;
-        intent=new Intent(getApplicationContext(),TimeAlarm.class);
-        intent.putExtra("NOTIFICATION","Time to complete your list"+values.get(pos).getName().toString());
-        intent.putExtra("ID", pos);
-        intent.putExtra("LONG", dateNotification.getTime());
-
-        PendingIntent sender = PendingIntent.getBroadcast(
-                getApplicationContext(), pos,
-                intent, 0);
-        AlarmManager am = null;
-        am = (AlarmManager) getSystemService(ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, dateNotification.getTime(),
-                sender);
-    }
+    
 
     public void populatelist(){
 
