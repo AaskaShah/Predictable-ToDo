@@ -25,7 +25,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_DETAIL = "detail";
     public static final String COLUMN_DATE = "date";
-    public static final String COLUMN_TIME = "time";
+    public static final String COLUMN_ALARMINFO = "info";
     public static final String COLUMN_ID="id";
 
     protected static String DB_PATH = "data/data/com.example.good.todo_app/databases/";
@@ -37,7 +37,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     // Database creation sql statement
     private static final String DATABASE_CREATE = "create table "
             + TABLE_LIST + "(" + COLUMN_NAME
-            + " text not null, " + COLUMN_DETAIL+ " text not null, " + COLUMN_DATE+ " text not null, " + COLUMN_TIME
+            + " text not null, " + COLUMN_DETAIL+ " text not null, " + COLUMN_DATE+ " text not null, " + COLUMN_ALARMINFO
             + " text not null, "+COLUMN_ID+" integer);";
 
 

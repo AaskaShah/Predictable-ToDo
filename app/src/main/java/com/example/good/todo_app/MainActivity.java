@@ -180,6 +180,34 @@ public class MainActivity extends Activity {
 //--
         radiopriority=(RadioGroup)findViewById(R.id.radiogroup);//add setonCheckedChangeListner here if priority not changing..
 
+        //----date picker
+        final Calendar c=Calendar.getInstance();
+        mYear=c.get(Calendar.YEAR);
+        mMonth=c.get(Calendar.MONTH);
+        mDay=c.get(Calendar.DAY_OF_MONTH);
+
+        final DatePickerDialog dpd = new DatePickerDialog(/*'this' here is not working*/this,
+                new DatePickerDialog.OnDateSetListener() {
+
+                    @Override
+                    public void onDateSet(DatePicker view, int year,
+                                          int monthOfYear, int dayOfMonth) {
+                        // Display Selected date in textbox
+                        date.setText(dayOfMonth + "-"
+                                + (monthOfYear + 1) + "-" + year);
+
+                    }
+                }, mYear, mMonth, mDay);
+        date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dpd.show();
+            }
+        });
+//-------
+
+
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -216,7 +244,7 @@ public class MainActivity extends Activity {
                         values.add(0, x);
                         for (Listitem l:values
                                 ) {
-                            datasource.insertlist(l.getName(),l.getDetails(),l.getDate(),l.getTime(),l.getId());
+                            datasource.insertlist(l.getName(),l.getDetails(),l.getDate(),l.getInfo(),l.getId());
                         }
 
                     }
@@ -230,35 +258,6 @@ public class MainActivity extends Activity {
 
             }
         });
-
-//----date picker
-        final Calendar c=Calendar.getInstance();
-        mYear=c.get(Calendar.YEAR);
-        mMonth=c.get(Calendar.MONTH);
-        mDay=c.get(Calendar.DAY_OF_MONTH);
-
-        final DatePickerDialog dpd = new DatePickerDialog(/*'this' here is not working*/this,
-                new DatePickerDialog.OnDateSetListener() {
-
-                    @Override
-                    public void onDateSet(DatePicker view, int year,
-                                          int monthOfYear, int dayOfMonth) {
-                        // Display Selected date in textbox
-                        date.setText(dayOfMonth + "-"
-                                + (monthOfYear + 1) + "-" + year);
-
-                    }
-                }, mYear, mMonth, mDay);
-        date.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dpd.show();
-            }
-        });
-//-------
-
-
 
 
     }
@@ -308,7 +307,7 @@ public class MainActivity extends Activity {
                     intent.putExtra("n", current.getName().toString());
                     intent.putExtra("det", current.getDetails().toString());
                     intent.putExtra("date", current.getDate().toString());
-                    intent.putExtra("t", current.getTime().toString());
+                    intent.putExtra("id", current.getId());
 
                     startActivity(intent);
                 }
